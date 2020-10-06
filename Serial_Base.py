@@ -3,7 +3,7 @@ import time, serial
 class Controller(object):
     def __init__(self):
         self.serial_option = {
-                'port': self.port, 'baudrate': self.baudrate, 'parity': self.parity, 'stopbits': self.stopbits, 
+                'port': 'test', 'baudrate': self.baudrate, 'parity': self.parity, 'stopbits': self.stopbits, 
                 'bytesize': serial.EIGHTBITS
             }
         self.delimiter = '\r\n'
@@ -16,16 +16,23 @@ class Controller(object):
         self.log_off()
 
     def log_on(self):
+        if self.serial_option['port'] == 'test':
+            return
         """serial port handle"""
         self.ser = serial.Serial(
             **self.serial_option
         )
 
     def log_off(self):
+        if self.serial_option['port'] == 'test':
+            return
         """close the port"""
         self.ser.close()
 
     def send_command(self, command):
+        if self.serial_option['port'] == 'test':
+            print(command)
+            return
         """ Send a text command"""
         self.ser.write((command+'\r\n').encode())
         time.sleep(0.2)
