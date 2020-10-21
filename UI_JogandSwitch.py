@@ -19,10 +19,10 @@ class UI_JogandSwitch(ttk.Frame):
         self.left_frame = ttk.Frame(self, borderwidth=1, relief='solid')
         self.left_frame.pack(anchor = W, expand = 1, fill = BOTH, side = LEFT, padx = 5, pady = 5)
 
-        self.left_frame.lavel = ttk.Label(self.left_frame, text='left', 
+        self.left_frame.label = ttk.Label(self.left_frame, text='left', 
             font=('Helvetica', '20', 'bold')
         )
-        self.left_frame.lavel.pack()
+        self.left_frame.label.pack()
 
         self.left_frame.goback_button_kinds = goback_label
         self.left_frame.goback_buttons = [
@@ -60,16 +60,22 @@ class UI_JogandSwitch(ttk.Frame):
             borderwidth=1, relief='solid')
         self.right_frame.pack(anchor = E, expand = 1, fill = BOTH, side = RIGHT, padx = 5, pady = 5)
         self.right_frame.label = ttk.Label(
-                self.right_frame, text='right', font=('Helvetica', '20', 'bold')
+                self.right_frame, text='right', font=('Helvetica', '20', 'bold'), justify = CENTER
             )
         self.right_frame.label.pack()
+        self.right_label_frame = ttk.Frame(self.right_frame)
+        self.right_label_frame.pack(fill = BOTH)
+        self.right_frame.button_frame = ttk.Frame(self.right_frame)
+        self.right_frame.button_frame.pack()
+
         self.right_frame.switch_buttons = [
                 ttk.Button(
-                    self.right_frame, text = i, 
+                    self.right_frame.button_frame, text = i, width = 6 
                 ) for i in range(switch_number)
             ]
-        for button in self.right_frame.switch_buttons:
-            button.pack(fill = BOTH, expand = 1, padx = 5, pady = 5)            
+        for i, button in enumerate(self.right_frame.switch_buttons):
+            button.grid(column = i//5, row = i%5, 
+                padx = 5, pady = 5)            
 
 def main():
     master = Tk()

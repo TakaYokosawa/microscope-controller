@@ -35,9 +35,7 @@ class OlympusBX3MCBFM(Controller):
         return message
 
     def change_objective(self, target):
-        current_objective = self.send_command('1OB?').split(' ')[1].split('\r\n')[0]
-        print(current_objective)
-        current_index = int(current_objective)
+        current_index = self.current_objective()
         target_index = self.objective_list.index(target) + 1
         if not current_index == target_index:
             for i in reversed(range(
@@ -47,9 +45,12 @@ class OlympusBX3MCBFM(Controller):
                 self.send_command(f'1OB {i}')
         return current_index, target_index
 
+    def current_objective(self):
+        return int(self.send_command('1OB?').split(' ')[1].split('\r\n')[0])
+
 if __name__ == '__main__':
     with OlympusBX3MCBFM() as B:
-        B.send_command('1OB 1')
+        B.current_objective()
 
 ## error due to bad contact
 

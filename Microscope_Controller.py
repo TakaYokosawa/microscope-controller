@@ -1,5 +1,6 @@
 import math
 from tkinter import *
+from tkinter import ttk
 
 from UI_JogandSwitch import UI_JogandSwitch
 from OlympusBX3MCBFM import OlympusBX3MCBFM
@@ -12,15 +13,21 @@ class main_window(UI_JogandSwitch):
         switch_number = 5
         super().__init__(master, goback_label, switch_number)
 
+        style = ttk.Style(master)
+        style.configure('white.TButton', background='white')
+        style.configure('green.TButton', background='green')
+
         self.label['text'] = 'microscope'
         self.left_frame.speed_frame['text'] = 'focus speed'
-        self.left_frame.lavel['text'] = 'focus'
+        self.left_frame.label['text'] = 'focus'
         self.right_frame.label['text'] = 'objective'
 
         objective_kinds = ['x5', 'x10', 'x20', 'x50', 'x100']
         for button, kind in zip( self.right_frame.switch_buttons, objective_kinds):
             button['text'] = kind
             button['command'] = self.objective_button_cmd(kind)
+
+        self.update_objective_button()
 
         self.left_frame.focus_speed_exp = DoubleVar(value= 0.0)
         self.left_frame.focus_speed = IntVar(value= 1)
@@ -93,7 +100,14 @@ class main_window(UI_JogandSwitch):
                             p.position_list[ current_index ] 
                         }'''
                     )
+            self.update_objective_button()
         return inner
+
+    def update_objective_button(self):
+        with OlympusBX3MCBFM({'port': 'COM7'}) as b:
+            self.current_objective = b.current_objective()
+        for i, button in enumerate(self.right_frame.switch_buttons):
+            button.configure(style = ('green' if i == self.current_objective - 1 else 'white') + '.TButton')
 
 def main():
     master = Tk()
