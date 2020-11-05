@@ -33,21 +33,34 @@ class main_window(UI_JogandSwitch):
         for i, (button, kind) in enumerate(zip(self.right_frame.switch_buttons, axis_kinds)):
             button['text'] = kind
             button['command'] = self.axis_button_cmd(i)
-        
         self.update_axis_button()
 
-        self.left_frame.move_speed = IntVar(value= 1)
-        self.left_frame.move_speed_field = StringVar(value= '')
+        self.is_continuous_move = BooleanVar(value= False)
+        ttk.Checkbutton(
+                self.move_option_frame, text = 'continuous', 
+                variable = self.is_continuous_move
+            ).pack(side = LEFT)
+        self.stop_button = ttk.Button(
+                self.move_option_frame, text = 'stop', 
+                command = self.stop_stage_move, width = 6, state = 'disabled'
+            )
+        self.stop_button.pack()
 
-        self.left_frame.speed_frame.speed_edit['textvariable'] = self.left_frame.move_speed_field
-        speed_scale_options = {'from_' : 1, 'to' : 48, 'variable' : self.left_frame.move_speed, 'command' : self.scale_command}
+        self.left_frame.move_speed = IntVar(value= 1)
+        self.is_fine_move = BooleanVar(value= False)
+        speed_scale_options = {
+                'from_' : 1, 'to' : 48, 
+                'variable' : self.left_frame.move_speed, 
+            }
         for k in speed_scale_options.keys():
             self.left_frame.speed_frame.speed_scale[k] = speed_scale_options[k]
+
+        ttk.Checkbutton(
+                self.left_frame.speed_frame, text = 'fine', 
+                variable = self.is_fine_move
+            ).pack()
                 
         self.left_frame.move_speed.trace('w', self.move_speed_cmd)
-        self.left_frame.move_speed_field.trace(
-                'w', self.move_speed_field_cmd 
-            )
 
         for button in self.left_frame.goback_buttons:
             button.bind(
@@ -59,12 +72,6 @@ class main_window(UI_JogandSwitch):
         self.left_frame.speed_frame.speed_display['text'] \
             = self.left_frame.move_speed.get()
 
-    def move_speed_field_cmd(self, *args):
-        if self.left_frame.move_speed_field.get().isdecimal() and 0 < int(self.left_frame.move_speed_field.get()) <= 48:
-            self.left_frame.move_speed.set(
-                    self.left_frame.move_speed_field.get()
-                )
-
     def move_button_pressed(self, kind):
         def inner(*e):
             print(kind, self.axis_status)
@@ -74,17 +81,37 @@ class main_window(UI_JogandSwitch):
                     cmd = '-'
                 else:
                     cmd = '+'
-            with OptoSigmaSRC101({'port': 'COM12'}) as o:
-                o.change_speed(int(self.left_frame.move_speed.get()))
-                o.jog_start(cmd)
+            if self.is_fine_move.get():
+                with OptoSigmaSRC101({'port': 'COM12'}) as o:
+                    o.pulse_move(cmd, int(self.left_frame.move_speed.get())*20)
+                self.left_frame.job = self.after(
+                        100, self.move_button_pressed(kind)
+                    )
+            else:
+                with OptoSigmaSRC101({'port': 'COM12'}) as o:
+                    o.change_speed(int(self.left_frame.move_speed.get()))
+                    o.jog_start(cmd)
+            if self.is_continuous_move.get():
+                for button in self.left_frame.goback_buttons \
+                    + self.right_frame.switch_buttons:
+                    button.state(['disabled'])
+                self.stop_button.state(['!disabled'])
         return inner
 
     def move_button_released(self, e):
-        with OptoSigmaSRC101({'port': 'COM12'}) as o:
-            o.stop_move()
+        if not self.is_continuous_move.get():
+            self.stop_stage_move()
 
-    def scale_command(self, e):
-        self.left_frame.move_speed_field.set('')
+    def stop_stage_move(self):
+        if self.is_fine_move.get():
+            self.after_cancel(self.left_frame.job)
+        else:
+            with OptoSigmaSRC101({'port': 'COM12'}) as o:
+                o.stop_move()
+        for button in self.left_frame.goback_buttons \
+            + self.right_frame.switch_buttons:
+            button.state(['!disabled'])
+        self.stop_button.state(['disabled'])
 
     def axis_button_cmd(self, kind):
         def inner():

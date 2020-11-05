@@ -33,6 +33,9 @@ class UI_JogandSwitch(ttk.Frame):
         for button in self.left_frame.goback_buttons:
             button.pack(fill = BOTH, expand = 1, padx = 5, pady = 5)
 
+        self.move_option_frame = ttk.Frame(self.left_frame)
+        self.move_option_frame.pack()
+
         self.left_frame.speed_frame = ttk.LabelFrame(
                 self.left_frame, text = 'speed'
             )
@@ -49,12 +52,6 @@ class UI_JogandSwitch(ttk.Frame):
                 from_ = 1, to = 48, 
             )
         self.left_frame.speed_frame.speed_scale.pack(side = LEFT, fill = X, expand = 1, padx = 5)        
-
-        self.left_frame.speed_frame.speed_edit = ttk.Entry(self.left_frame.speed_frame,
-                validate = 'key',
-                width=5
-            )
-        self.left_frame.speed_frame.speed_edit.pack(side = RIGHT)
 
         self.right_frame = ttk.Frame(self, 
             borderwidth=1, relief='solid')

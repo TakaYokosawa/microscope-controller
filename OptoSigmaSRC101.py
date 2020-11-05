@@ -14,8 +14,7 @@ class OptoSigmaSRC101(Controller):
         self.send_command('G:')
 
     def pulse_move(self, direction, number):
-        sdire = '+' if direction else '-'
-        self.send_command(f'M:1{sdire}P{int(number)}')
+        self.send_command(f'M:1{direction}P{int(number)}')
         self.send_command('G:')
 
     def stop_move(self):

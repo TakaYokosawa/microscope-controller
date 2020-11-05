@@ -26,22 +26,15 @@ class main_window(UI_JogandSwitch):
         for button, kind in zip( self.right_frame.switch_buttons, objective_kinds):
             button['text'] = kind
             button['command'] = self.objective_button_cmd(kind)
-
         self.update_objective_button()
 
         self.left_frame.focus_speed_exp = DoubleVar(value= 0.0)
         self.left_frame.focus_speed = IntVar(value= 1)
-        self.left_frame.focus_speed_field = StringVar(value= '')
-
-        self.left_frame.speed_frame.speed_edit['textvariable'] = self.left_frame.focus_speed_field
         speed_scale_options = {'from_' : 0.0, 'to' : 3.0, 'variable' : self.left_frame.focus_speed_exp, 'command' : self.scale_command}
         for k in speed_scale_options.keys():
             self.left_frame.speed_frame.speed_scale[k] = speed_scale_options[k]
 
         self.left_frame.focus_speed.trace('w', self.focus_speed_cmd)
-        self.left_frame.focus_speed_field.trace(
-                'w', self.focus_speed_field_cmd 
-            )
 
         for button in self.left_frame.goback_buttons:
             button.bind(
@@ -55,12 +48,6 @@ class main_window(UI_JogandSwitch):
             ))
         self.left_frame.speed_frame.speed_display['text'] \
             = self.left_frame.focus_speed.get()
-
-    def focus_speed_field_cmd(self, *args):
-        if self.left_frame.focus_speed_field.get().isdecimal() and 0 < int(self.left_frame.focus_speed_field.get()) <= 1000:
-            self.left_frame.focus_speed.set(
-                    self.left_frame.focus_speed_field.get()
-                )
 
     def focus_button_pressed(self, kind):
         def inner(*e):
@@ -87,7 +74,6 @@ class main_window(UI_JogandSwitch):
         self.left_frame.focus_speed.set(
                 10**self.left_frame.focus_speed_exp.get()
             )
-        self.left_frame.focus_speed_field.set('')
 
     def objective_button_cmd(self, kind):
         def inner():
