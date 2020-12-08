@@ -51,10 +51,6 @@ class main_window(UI_JogandSwitch):
 
     def focus_button_pressed(self, kind):
         def inner(*e):
-            print(
-                    f'C {self.left_frame.focus_speed.get()}', 
-                    f'''{kind}'''
-                )
             with PriorES10ZE({'port': 'COM9'}) as p:
                 p.send_command(
                         f'C {self.left_frame.focus_speed.get()}'

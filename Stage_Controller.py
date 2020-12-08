@@ -74,7 +74,6 @@ class main_window(UI_JogandSwitch):
 
     def move_button_pressed(self, kind):
         def inner(*e):
-            print(kind, self.axis_status)
             cmd = kind
             if self.axis_status.index('1') == 1 or self.axis_status.index('1') == 5:
                 if kind == '+':
@@ -83,7 +82,8 @@ class main_window(UI_JogandSwitch):
                     cmd = '+'
             if self.is_fine_move.get():
                 with OptoSigmaSRC101({'port': 'COM12'}) as o:
-                    o.pulse_move(cmd, int(self.left_frame.move_speed.get())*20)
+                    ##TODO: find good magnification
+                    o.pulse_move(cmd, int(self.left_frame.move_speed.get())*160)
                 self.left_frame.job = self.after(
                         100, self.move_button_pressed(kind)
                     )

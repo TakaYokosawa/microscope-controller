@@ -38,5 +38,5 @@ class OptoSigmaSRC101(Controller):
         self.send_command('?:S')
 
 if __name__ == '__main__':
-    with OptoSigmaSRC101({'port': 'test'}) as o:
-        o.software_version()
+    with OptoSigmaSRC101({'port': 'COM12'}) as o:
+        o.pulse_move('+', 50000)

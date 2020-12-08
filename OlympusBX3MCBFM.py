@@ -29,9 +29,6 @@ class OlympusBX3MCBFM(Controller):
             print ('maybe no control')
         elif 'E013F01' in message.split(' ')[1]:
             print('maybe error')
-        # elif message.split(' ')[1] == 'E013F0120\r\n' \
-        #         or message.split(' ')[1] == 'E013F0130\r\n':
-        #     print('maybe error')
         return message
 
     def change_objective(self, target):
