@@ -30,7 +30,11 @@ class main_window(UI_JogandSwitch):
 
         self.left_frame.focus_speed_exp = DoubleVar(value= 0.0)
         self.left_frame.focus_speed = IntVar(value= 1)
-        speed_scale_options = {'from_' : 0.0, 'to' : 3.0, 'variable' : self.left_frame.focus_speed_exp, 'command' : self.scale_command}
+        speed_scale_options = {
+                'from_' : 0.0, 'to' : 3.0, 
+                'variable' : self.left_frame.focus_speed_exp, 
+                'command' : self.scale_command
+            }
         for k in speed_scale_options.keys():
             self.left_frame.speed_frame.speed_scale[k] = speed_scale_options[k]
 

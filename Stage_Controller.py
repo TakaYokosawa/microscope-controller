@@ -23,7 +23,7 @@ class main_window(UI_JogandSwitch):
         self.right_frame.label['text'] = 'axis change'
 
         ttk.Label(
-                self.right_label_frame, text='stack', font=('Helvetica', '15', 'bold')#, justify = CENTER
+                self.right_label_frame, text='stack', font=('Helvetica', '15', 'bold')
             ).pack(side = LEFT, expand = True)
         ttk.Label(
                 self.right_label_frame, text='sample', font=('Helvetica', '15', 'bold')
@@ -46,11 +46,13 @@ class main_window(UI_JogandSwitch):
             )
         self.stop_button.pack()
 
+        self.left_frame.move_speed_exp = DoubleVar(value= 0.0)
         self.left_frame.move_speed = IntVar(value= 1)
         self.is_fine_move = BooleanVar(value= False)
         speed_scale_options = {
-                'from_' : 1, 'to' : 48, 
-                'variable' : self.left_frame.move_speed, 
+                'from_' : 0.0, 'to' : math.log2(48), 
+                'variable' : self.left_frame.move_speed_exp, 
+                'command' : self.scale_command
             }
         for k in speed_scale_options.keys():
             self.left_frame.speed_frame.speed_scale[k] = speed_scale_options[k]
@@ -83,7 +85,8 @@ class main_window(UI_JogandSwitch):
             if self.is_fine_move.get():
                 with OptoSigmaSRC101({'port': 'COM12'}) as o:
                     ##TODO: find good magnification
-                    o.pulse_move(cmd, int(self.left_frame.move_speed.get())*160)
+                    o.change_speed(int(self.left_frame.move_speed.get()))
+                    o.pulse_move(cmd, 1000)
                 self.left_frame.job = self.after(
                         100, self.move_button_pressed(kind)
                     )
@@ -126,6 +129,10 @@ class main_window(UI_JogandSwitch):
         for button, status in zip(self.right_frame.switch_buttons, self.axis_status):
             button.configure(style = ('green' if int(status) else 'white') + '.TButton')
         
+    def scale_command(self, e):
+        self.left_frame.move_speed.set(
+                2**self.left_frame.move_speed_exp.get()
+            )
 
 def main():
     master = Tk()
